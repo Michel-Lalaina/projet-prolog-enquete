@@ -5,5 +5,5 @@ Il permet de verifier si un suspect est coupable ou non d'un crime donner.
 
 Comment utiliser
 
-1. Ouvrir SWI-Prolog
-2. Charger le fichier :
+1 Ouvrir SWI-Prolog
+2 Charger le fichier 
