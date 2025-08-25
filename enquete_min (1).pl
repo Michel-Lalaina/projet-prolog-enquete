@@ -1,7 +1,5 @@
-% 1253H_F
-% Projet IA : Enquête policière
+:- use_module(library(pce)).
 
-% typ de crime
 crime_type(assassinat).
 crime_type(vol).
 crime_type(escroquerie).
@@ -41,13 +39,28 @@ is_guilty(Suspect, escroquerie) :-
     owns_fake_identity(Suspect, escroquerie).
 
 main :-
-    write('Entrer un suspect : '), nl,
-    read(Suspect),
-    write('Entrer un type de crime : '), nl,
-    read(CrimeType),
-    ( is_guilty(Suspect, CrimeType) ->
-        writeln('=> Le suspect est COUPABLE')
+    new(D, dialog('Enquête Policiere')),
+    findall(S, suspect(S), Suspects),
+    findall(C, crime_type(C), Crimes),
+    new(SuspectMenu, menu(suspect)),
+    send_list(SuspectMenu, append, Suspects),
+    send(D, append, SuspectMenu),
+    new(CrimeMenu, menu(crime)),
+    send_list(CrimeMenu, append, Crimes),
+    send(D, append, CrimeMenu),
+    send(D, append, button('Verifier',
+        message(@prolog, check_guilt_gui, SuspectMenu?selection, CrimeMenu?selection))),
+    send(D, append, button('Quitter', message(D, destroy))),
+    send(D, open).
+
+check_guilt_gui(Suspect, Crime) :-
+    ( is_guilty(Suspect, Crime) ->
+        format(string(M), '=> Le suspect ~w est COUPABLE de ~w', [Suspect, Crime])
     ;
-        writeln('=> Le suspect est NON COUPABLE')
+        format(string(M), '=> Le suspect ~w est NON COUPABLE de ~w', [Suspect, Crime])
     ),
-    halt.
+    new(R, dialog('Resultat')),
+    send(R, append, label(result, M)),
+    send(R, append, button(ok, message(R, destroy))),
+    send(R, open).
+
